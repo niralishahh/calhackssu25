@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Transcription</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .metadata {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .metadata-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .metadata-item h4 {
+            color: #667eea;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .metadata-item p {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .view-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .view-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .view-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .transcription-view {
+            display: none;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .transcription-view.active {
+            display: block;
+        }
+
+        .transcription-text {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .transcription-segments, .transcription-chunks {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .segment, .chunk {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .segment-time, .chunk-time {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .segment-text, .chunk-text {
+            font-weight: 500;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .segment-words, .chunk-words {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .word {
+            display: inline-block;
+            margin: 2px;
+            padding: 2px 4px;
+            background: #e9ecef;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .word:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .json-viewer {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .json-key {
+            color: #9cdcfe;
+        }
+
+        .json-string {
+            color: #ce9178;
+        }
+
+        .json-number {
+            color: #b5cea8;
+        }
+
+        .json-boolean {
+            color: #569cd6;
+        }
+
+        .json-null {
+            color: #569cd6;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #c62828;
+            margin: 20px 0;
+        }
+
+        .back-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-bottom: 20px;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #5a67d8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Transcription Viewer</h1>
+            <p>View and explore your transcription data</p>
+        </div>
+
+        <div class="content">
+            <button class="back-btn" onclick="window.close()">← Close</button>
+            
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Loading transcription...</p>
+            </div>
+
+            <div id="error" class="error" style="display: none;">
+                <h3>Error</h3>
+                <p id="error-message"></p>
+            </div>
+
+            <div id="content" style="display: none;">
+                <div class="metadata" id="metadata">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+
+                <div class="view-toggle">
+                    <button class="view-btn active" onclick="switchView('segments')">Segments View</button>
+                    <button class="view-btn" onclick="switchView('text')">Text View</button>
+                </div>
+
+                <div id="segments-view" class="transcription-view active">
+                    <div class="transcription-segments" id="transcription-segments"></div>
+                </div>
+
+                <div id="text-view" class="transcription-view">
+                    <div class="transcription-text" id="transcription-text"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        let currentTranscriptionData = null;
+
+        // Get transcription ID from URL parameters
+        function getTranscriptionId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        // Load transcription data
+        async function loadTranscription() {
+            const transcriptionId = getTranscriptionId();
+            if (!transcriptionId) {
+                showError('No transcription ID provided');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/transcriptions/${transcriptionId}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                currentTranscriptionData = data;
+                
+                hideLoading();
+                showContent();
+                populateMetadata(data);
+                populateView('segments', data);
+                
+            } catch (error) {
+                showError('Failed to load transcription: ' + error.message);
+            }
+        }
+
+        // View switching
+        function switchView(viewName) {
+            // Hide all views
+            document.querySelectorAll('.transcription-view').forEach(view => {
+                view.classList.remove('active');
+            });
+            
+            // Remove active class from all view buttons
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected view
+            document.getElementById(viewName + '-view').classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+            
+            // Populate the view if we have data
+            if (currentTranscriptionData) {
+                populateView(viewName, currentTranscriptionData);
+            }
+        }
+
+        function populateView(viewName, data) {
+            switch(viewName) {
+                case 'text':
+                    document.getElementById('transcription-text').textContent = data.text;
+                    break;
+                case 'segments':
+                    populateSegmentsView(data);
+                    break;
+            }
+        }
+
+        function populateSegmentsView(data) {
+            const segmentsContainer = document.getElementById('transcription-segments');
+            
+            if (!data.segments || data.segments.length === 0) {
+                segmentsContainer.innerHTML = '<p>No segments available</p>';
+                return;
+            }
+            
+            segmentsContainer.innerHTML = data.segments.map((segment, index) => {
+                const startTime = formatTime(segment.start);
+                const endTime = formatTime(segment.end);
+                const words = segment.words ? segment.words.map(word => 
+                    `<span class="word" title="${formatTime(word.start)} - ${formatTime(word.end)}">${word.word}</span>`
+                ).join('') : '';
+                
+                return `
+                    <div class="segment">
+                        <div class="segment-time">${startTime} - ${endTime}</div>
+                        <div class="segment-text">${segment.text}</div>
+                        ${words ? `<div class="segment-words">${words}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function populateMetadata(data) {
+            const metadata = document.getElementById('metadata');
+            metadata.innerHTML = `
+                <div class="metadata-item">
+                    <h4>Filename</h4>
+                    <p>${data.filename || 'Unknown'}</p>
+                </div>
+                <div class="metadata-item">
+                    <h4>Duration</h4>
+                    <p>${formatDuration(data.duration)}</p>
+                </div>
+            `;
+        }
+
+        function formatDuration(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = Math.floor(seconds % 60);
+            
+            if (hours > 0) {
+                return `${hours}h ${minutes}m ${secs}s`;
+            } else if (minutes > 0) {
+                return `${minutes}m ${secs}s`;
+            } else {
+                return `${secs}s`;
+            }
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('content').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function showContent() {
+            document.getElementById('content').style.display = 'block';
+        }
+
+        function showError(message) {
+            hideLoading();
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error-message').textContent = message;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTranscription();
+        });
+    </script>
+</body>
+</html> 
