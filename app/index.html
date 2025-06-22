@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude AI Research Agent</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .form-section {
+            margin-bottom: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="file"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="file"]:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .file-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .supported-formats {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 8px;
+            font-size: 14px;
+            color: #1976d2;
+        }
+
+        .supported-formats strong {
+            color: #1565c0;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+        }
+
+        .chat-container {
+            border: 2px solid #e1e5e9;
+            border-radius: 15px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+            display: flex;
+        }
+
+        .chat-message.user {
+            justify-content: flex-end;
+        }
+
+        .chat-message.bot {
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
+
+        .chat-message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .chat-message.bot .message-content {
+            background: white;
+            border: 1px solid #e1e5e9;
+            color: #333;
+        }
+
+        .chat-input-container {
+            display: flex;
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .chat-input-container input {
+            flex: 1;
+            margin-right: 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 25px;
+            padding: 12px 20px;
+            font-size: 16px;
+        }
+
+        .chat-input-container input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .chat-input-container .btn {
+            border-radius: 25px;
+            padding: 12px 20px;
+            margin: 0;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 12px 16px;
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 18px;
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Claude AI Research Agent</h1>
+            <p>Powered by Anthropic's Claude AI</p>
+        </div>
+
+        <div class="main-content">
+            <div class="status" id="status"></div>
+
+            <div class="form-section">
+                <h3>🤖 AI Research Agent</h3>
+                <p>Upload a document and interact with your AI research assistant. Ask questions, get summaries, and extract direct quotes with page numbers.</p>
+                
+                <div class="form-group">
+                    <label for="chatFileInput">Upload Document:</label>
+                    <input type="file" id="chatFileInput" accept=".pdf,.txt,.md,.py,.js,.html,.css,.json,.xml,.csv">
+                    <div class="supported-formats">
+                        <strong>Supported formats:</strong> PDF, TXT, MD, PY, JS, HTML, CSS, JSON, XML, CSV
+                    </div>
+                    <div class="file-info" id="chatFileInfo" style="display: none;"></div>
+                </div>
+                
+                <div class="chat-container" id="chatContainer" style="display: none;">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="chat-message bot">
+                            <div class="message-content">
+                                <strong>🤖 Claude:</strong> Hello! I've loaded your document. I'm your intelligent AI research agent with advanced planning capabilities.
+                                <br><br>
+                                <strong>🧠 What I can do:</strong>
+                                <ul>
+                                    <li>Analyze documents and answer questions intelligently</li>
+                                    <li>Extract direct quotes with page numbers when requested</li>
+                                    <li>Generate comprehensive summaries and key points</li>
+                                    <li>Plan and execute complex multi-step analyses</li>
+                                    <li>Adapt my approach based on your specific needs</li>
+                                </ul>
+                                <br>
+                                <strong>💡 Just ask naturally:</strong>
+                                <ul>
+                                    <li>"Summarize this document"</li>
+                                    <li>"What are the main topics discussed?"</li>
+                                    <li>"Give me quotes about budget discussions"</li>
+                                    <li>"Who were the key speakers and what did they say?"</li>
+                                    <li>"Analyze the decision-making process"</li>
+                                </ul>
+                                <br>
+                                <em>I'll automatically choose the best tools and approach for your request!</em>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input-container">
+                        <input type="text" id="chatInput" placeholder="Ask a question about the document..." disabled>
+                        <button class="btn" id="sendButton" onclick="sendMessage()" disabled>Send</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Processing your document with Claude AI...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5004';
+
+        // Global variables for chat
+        let currentChatFile = null;
+        let chatHistory = [];
+        let isProcessing = false; // Flag to prevent multiple simultaneous requests
+
+        function showStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    status.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        function showLoading(show = true) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        // Check API health on page load
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                
+                if (data.agent_initialized) {
+                    showStatus('✅ Claude AI Agent is ready!', 'success');
+                } else {
+                    showStatus('⚠️ Agent is initializing...', 'info');
+                }
+            } catch (error) {
+                showStatus('❌ Cannot connect to API server. Please ensure the backend is running.', 'error');
+            }
+        });
+
+        function resetChatState() {
+            // Reset processing flag
+            isProcessing = false;
+            
+            // Clear chat history
+            chatHistory = [];
+            
+            // Re-enable input
+            const input = document.getElementById('chatInput');
+            const sendButton = document.getElementById('sendButton');
+            input.disabled = false;
+            sendButton.disabled = false;
+            
+            // Hide any existing typing indicator
+            hideTypingIndicator();
+        }
+
+        // Chat file upload handler
+        document.getElementById('chatFileInput').addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            showStatus('Uploading document for chat...', 'info');
+            
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                const response = await fetch(`${API_BASE}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentChatFile = data.file_path;
+                    document.getElementById('chatFileInfo').innerHTML = `
+                        <strong>📄 ${file.name}</strong><br>
+                        Size: ${(file.size / 1024).toFixed(1)} KB
+                    `;
+                    document.getElementById('chatFileInfo').style.display = 'block';
+                    
+                    // Show chat interface
+                    document.getElementById('chatContainer').style.display = 'block';
+                    document.getElementById('chatInput').disabled = false;
+                    document.getElementById('sendButton').disabled = false;
+                    
+                    // Reset chat state for new document
+                    resetChatState();
+                    
+                    // Clear chat history
+                    chatHistory = [];
+                    document.getElementById('chatMessages').innerHTML = `
+                        <div class="chat-message bot">
+                            <div class="message-content">
+                                <strong>🤖 Claude:</strong> Hello! I've loaded your document. I'm your intelligent AI research agent with advanced planning capabilities.
+                                <br><br>
+                                <strong>🧠 What I can do:</strong>
+                                <ul>
+                                    <li>Analyze documents and answer questions intelligently</li>
+                                    <li>Extract direct quotes with page numbers when requested</li>
+                                    <li>Generate comprehensive summaries and key points</li>
+                                    <li>Plan and execute complex multi-step analyses</li>
+                                    <li>Adapt my approach based on your specific needs</li>
+                                </ul>
+                                <br>
+                                <strong>💡 Just ask naturally:</strong>
+                                <ul>
+                                    <li>"Summarize this document"</li>
+                                    <li>"What are the main topics discussed?"</li>
+                                    <li>"Give me quotes about budget discussions"</li>
+                                    <li>"Who were the key speakers and what did they say?"</li>
+                                    <li>"Analyze the decision-making process"</li>
+                                </ul>
+                                <br>
+                                <em>I'll automatically choose the best tools and approach for your request!</em>
+                            </div>
+                        </div>
+                    `;
+                    
+                    showStatus('Document loaded! You can now ask questions.', 'success');
+                } else {
+                    showStatus(`Upload failed: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        });
+
+        // Send message function
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message || !currentChatFile) {
+                console.log('Debug: message =', message, 'currentChatFile =', currentChatFile);
+                return;
+            }
+            
+            // Prevent multiple simultaneous requests
+            if (isProcessing) {
+                console.log('Debug: Already processing a request, ignoring new request');
+                return;
+            }
+            
+            isProcessing = true;
+            
+            // Disable input while processing
+            input.disabled = true;
+            document.getElementById('sendButton').disabled = true;
+            
+            // Add user message to chat
+            addMessageToChat('user', message);
+            input.value = '';
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            try {
+                console.log('Debug: Sending request to agentic-execute with file:', currentChatFile);
+                
+                // Add timeout to prevent hanging requests
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+                
+                // Use the agentic execution endpoint
+                const response = await fetch(`${API_BASE}/agentic-execute`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        file_path: currentChatFile,
+                        request: message
+                    }),
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                const data = await response.json();
+                console.log('Debug: Received response:', data);
+                
+                if (response.ok) {
+                    // Handle different types of results
+                    if (data.result && data.result.multi_tool_results) {
+                        // Multiple tools were executed
+                        let responseText = `🤖 **AI Agent Response**\n\n`;
+                        responseText += `${data.result.summary}\n\n`;
+                        
+                        data.result.multi_tool_results.forEach((toolResult, index) => {
+                            responseText += `**Tool ${index + 1}: ${toolResult.tool}**\n`;
+                            if (toolResult.result && toolResult.result.answer) {
+                                responseText += toolResult.result.answer;
+                            } else if (toolResult.result && toolResult.result.quotes) {
+                                responseText += toolResult.result.quotes;
+                            } else if (toolResult.result && toolResult.result.summary) {
+                                responseText += toolResult.result.summary;
+                            } else {
+                                responseText += JSON.stringify(toolResult.result, null, 2);
+                            }
+                            responseText += '\n\n';
+                        });
+                        
+                        addMessageToChat('bot', responseText);
+                    } else if (data.result) {
+                        // Single tool result
+                        let responseText = '';
+                        if (data.result.answer) {
+                            responseText = data.result.answer;
+                        } else if (data.result.quotes) {
+                            responseText = `📄 **Quote Extraction Results**\n\n${data.result.quotes}\n\n*Found ${data.result.total_quotes_found} relevant quotes*`;
+                        } else if (data.result.summary) {
+                            responseText = `📋 **Summary**\n\n${data.result.summary}`;
+                        } else {
+                            responseText = JSON.stringify(data.result, null, 2);
+                        }
+                        
+                        addMessageToChat('bot', responseText);
+                    } else {
+                        addMessageToChat('bot', 'Sorry, I received an unexpected response format from the AI agent.');
+                    }
+                    
+                    // Add to chat history
+                    chatHistory.push({
+                        question: message,
+                        answer: data.result || data,
+                        timestamp: new Date().toISOString()
+                    });
+                } else {
+                    console.error('API Error:', data);
+                    addMessageToChat('bot', `Sorry, I encountered an error: ${data.error || data.detail || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('Network error:', error);
+                hideTypingIndicator();
+                
+                if (error.name === 'AbortError') {
+                    addMessageToChat('bot', 'Sorry, the request took too long. Please try again with a simpler question.');
+                } else {
+                    addMessageToChat('bot', `Sorry, I couldn't process your request. Please try again.`);
+                }
+            } finally {
+                // Always re-enable input and hide typing indicator
+                hideTypingIndicator();
+                input.disabled = false;
+                document.getElementById('sendButton').disabled = false;
+                input.focus(); // Refocus the input for the next question
+                isProcessing = false; // Reset the processing flag
+            }
+        }
+
+        // Add message to chat
+        function addMessageToChat(sender, content) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${sender}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            if (sender === 'user') {
+                contentDiv.textContent = content;
+            } else {
+                contentDiv.innerHTML = `<strong>🤖 Claude:</strong> ${content.replace(/\n/g, '<br>')}`;
+            }
+            
+            messageDiv.appendChild(contentDiv);
+            messagesContainer.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Show typing indicator
+        function showTypingIndicator() {
+            const messagesContainer = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'chat-message bot';
+            typingDiv.id = 'typing-indicator';
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content typing-indicator';
+            contentDiv.textContent = '🤖 Claude is thinking...';
+            
+            typingDiv.appendChild(contentDiv);
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Hide typing indicator
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        // Handle Enter key in chat input
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html> 
