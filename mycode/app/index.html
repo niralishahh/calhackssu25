@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Transcription Agent</title>
+    <title>Open Record - Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -13,168 +13,704 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f8fafc;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
-        .landing-container {
+        /* Header */
+        .header {
             background: #ffffff;
-            border-radius: 20px;
-            padding: 48px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            width: 90%;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .logo {
-            font-size: 48px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #1A2B4C; /* Navy Blue */
+        }
+
+        .nav-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-button:hover {
+            background: #2563eb;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 48px 40px;
+            max-width: 900px;
+            margin: auto;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            color: #4B5563; /* Slate Gray */
+            margin-bottom: 32px;
+        }
+
+        .actions-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 24px;
         }
 
-        .title {
-            font-size: 32px;
-            font-weight: 700;
+        .new-chat-btn {
+            background-color: #D4A017; /* Goldenrod */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .new-chat-btn:hover {
+            background-color: #B8860B; /* Darker Goldenrod */
+        }
+        
+        /* Chats Grid */
+        .chat-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .chat-card {
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: box-shadow 0.2s;
+        }
+
+        .chat-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .chat-main {
+            flex-grow: 1;
+        }
+
+        .chat-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .chat-date {
+            font-size: 14px;
+            color: #4B5563; /* Slate Gray */
+        }
+
+        .chat-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 14px;
+            color: #4B5563; /* Slate Gray */
+            margin-top: auto;
+            padding-top: 12px;
+            border-top: 1px solid #f1f5f9;
+            width: 100%;
+        }
+
+        .chat-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            align-items: center;
+        }
+
+        .open-chat-btn {
+            background-color: #1A2B4C; /* Navy Blue */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            margin-left: auto; /* Pushes this button to the right */
+        }
+
+        .open-chat-btn:hover {
+            background-color: #111D33; /* Darker Navy */
+        }
+
+        .action-btn {
+            background-color: #f1f5f9;
+            color: #4B5563; /* Slate Gray */
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .action-btn:hover {
+            background-color: #e2e8f0;
+        }
+
+        .action-btn.delete {
+            color: #dc2626;
+        }
+
+        .action-btn.delete:hover {
+            background-color: #fecaca;
+            color: #b91c1c;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 24px;
+        }
+
+        .empty-state-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #374151;
+        }
+        
+        .empty-state-subtitle {
+             font-size: 16px;
+             line-height: 1.5;
+             margin-bottom: 32px;
+         }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            color: #64748b;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 400px;
+            width: 90%;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.show .modal {
+            transform: scale(1);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
             color: #1e293b;
             margin-bottom: 16px;
         }
 
-        .subtitle {
-            font-size: 18px;
-            color: #64748b;
-            margin-bottom: 32px;
-            line-height: 1.6;
-        }
-
-        .features {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 32px;
-            text-align: left;
-        }
-
-        .feature {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 16px;
-            color: #374151;
-        }
-
-        .feature-icon {
-            font-size: 20px;
-        }
-
-        .buttons {
-            display: flex;
-            gap: 16px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 12px 24px;
+        .modal-input {
+            width: 100%;
+            border: 1px solid #d1d5db;
             border-radius: 8px;
-            font-size: 16px;
-            font-weight: 500;
-            text-decoration: none;
-            transition: all 0.2s;
-            border: none;
-            cursor: pointer;
+            padding: 12px;
+            font-size: 14px;
+            margin-bottom: 24px;
         }
 
-        .btn-primary {
-            background: #3b82f6;
+        .modal-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        .modal-btn.cancel {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .modal-btn.cancel:hover {
+            background: #e2e8f0;
+        }
+
+        .modal-btn.confirm {
+            background: #ef4444;
             color: white;
         }
 
-        .btn-primary:hover {
-            background: #2563eb;
-            transform: translateY(-2px);
+        .modal-btn.confirm:hover {
+            background: #dc2626;
         }
 
-        .btn-secondary {
-            background: #f1f5f9;
-            color: #374151;
+        .modal-btn.create {
+            background: #10b981;
+            color: white;
         }
 
-        .btn-secondary:hover {
-            background: #e2e8f0;
-            transform: translateY(-2px);
+        .modal-btn.create:hover {
+            background: #059669;
         }
 
-        .auto-redirect {
-            margin-top: 24px;
-            font-size: 14px;
-            color: #64748b;
+        .chat-footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 16px;
         }
 
-        .countdown {
-            font-weight: 600;
-            color: #3b82f6;
-        }
+        /* Responsive */
+         @media (max-width: 768px) {
+             .main-content {
+                 padding: 16px;
+             }
+ 
+             .page-title {
+                 font-size: 24px;
+             }
+ 
+             .actions-bar {
+                 flex-direction: column;
+                 gap: 16px;
+                 align-items: stretch;
+             }
+ 
+             .chat-list {
+                 grid-template-columns: 1fr;
+             }
+ 
+             .header {
+                 padding: 12px 16px;
+             }
+ 
+             .header-left {
+                 gap: 12px;
+             }
+         }
     </style>
 </head>
 <body>
-    <div class="landing-container">
-        <div class="logo">🎙️</div>
-        <h1 class="title">AI Transcription Agent</h1>
-        <p class="subtitle">
-            Transform your audio and video files into searchable, analyzable text with AI-powered transcription and chat capabilities.
-        </p>
-        
-        <div class="features">
-            <div class="feature">
-                <span class="feature-icon">🎯</span>
-                <span>Multi-format audio/video transcription</span>
-            </div>
-            <div class="feature">
-                <span class="feature-icon">💬</span>
-                <span>AI-powered chat analysis</span>
-            </div>
-            <div class="feature">
-                <span class="feature-icon">📊</span>
-                <span>Organized conversation management</span>
-            </div>
-            <div class="feature">
-                <span class="feature-icon">🔍</span>
-                <span>Advanced search and filtering</span>
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#1A2B4C"/>
+                    <path d="M12 18C15.31 18 18 15.31 18 12H16C16 14.21 14.21 16 12 16V18Z" fill="#1A2B4C"/>
+                    <path d="M12 6C9.79 6 8 7.79 8 10H10C10 8.9 10.9 8 12 8V6Z" fill="#1A2B4C"/>
+                </svg>
+                <span>Open Record</span>
             </div>
         </div>
+    </header>
 
-        <div class="buttons">
-            <a href="dashboard.html" class="btn btn-primary">🚀 Get Started</a>
-            <a href="chat_interface.html" class="btn btn-secondary">💬 Try Chat</a>
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Your Conversations</h1>
+            <p class="page-subtitle">Manage your conversations and start new ones</p>
         </div>
 
-        <div class="auto-redirect">
-            Redirecting to dashboard in <span class="countdown" id="countdown">5</span> seconds...
+        <div class="actions-bar">
+            <button class="new-chat-btn" id="new-chat-btn">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M10 3a1 1 0 0 1 1 1v5h5a1 1 0 1 1 0 2h-5v5a1 1 0 1 1-2 0v-5H4a1 1 0 1 1 0-2h5V4a1 1 0 0 1 1-1Z"/></svg>
+                New Chat
+            </button>
+        </div>
+
+        <div class="chat-list" id="chat-list-container">
+            <div class="loading">Loading your chats...</div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="create-chat-modal">
+        <div class="modal">
+            <h3 class="modal-title">Create New Chat</h3>
+            <input 
+                type="text" 
+                class="modal-input" 
+                id="new-chat-title" 
+                placeholder="Enter chat title..."
+                maxlength="100"
+            >
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="hideCreateChatModal()">Cancel</button>
+                <button class="modal-btn create" onclick="createNewChat()">Create Chat</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="delete-chat-modal">
+        <div class="modal">
+            <h3 class="modal-title">Delete Chat</h3>
+            <p style="margin-bottom: 24px; color: #64748b;">
+                Are you sure you want to delete "<span id="delete-chat-name"></span>"? This action cannot be undone.
+            </p>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="hideDeleteChatModal()">Cancel</button>
+                <button class="modal-btn confirm" onclick="confirmDeleteChat()">Delete Chat</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // Auto-redirect to dashboard after 5 seconds
-        let countdown = 5;
-        const countdownElement = document.getElementById('countdown');
-        
-        const timer = setInterval(() => {
-            countdown--;
-            countdownElement.textContent = countdown;
-            
-            if (countdown <= 0) {
-                clearInterval(timer);
-                window.location.href = 'dashboard.html';
-            }
-        }, 1000);
+        const API_BASE = 'http://localhost:8000';
+        let currentUserId = null;
+        let chats = [];
+        let chatToDelete = null;
 
-        // Allow immediate navigation
-        document.querySelector('.btn-primary').addEventListener('click', () => {
-            clearInterval(timer);
+        document.addEventListener('DOMContentLoaded', async () => {
+            currentUserId = localStorage.getItem('userId');
+            
+            // If there's no user ID, we need to create one.
+            // A good way is to create a chat, which also creates a user.
+            if (!currentUserId) {
+                console.log("No user ID found. A new user will be created on first chat.");
+            }
+
+            await loadUserChats();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            document.getElementById('new-chat-btn').addEventListener('click', createNewChat);
+        }
+
+        async function loadUserChats() {
+            const container = document.getElementById('chat-list-container');
+            container.innerHTML = '<div class="loading">Loading your chats...</div>';
+            
+            if (!currentUserId) {
+                container.innerHTML = '<div class="empty-state">Welcome! Create your first chat to get started.</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/chats/${currentUserId}`);
+                if (!response.ok) throw new Error('Failed to fetch chats.');
+                
+                const data = await response.json();
+                const chats = data.chats || [];
+
+                if (chats.length > 0) {
+                    displayChats(chats);
+                } else {
+                    container.innerHTML = '<div class="empty-state">No chats found. Create one to get started!</div>';
+                }
+            } catch (error) {
+                console.error('Error loading chats:', error);
+                container.innerHTML = '<div class="empty-state">Could not load your chats.</div>';
+            }
+        }
+
+        function displayChats(chats) {
+            const container = document.getElementById('chat-list-container');
+            container.innerHTML = chats.map(chat => `
+                <div class="chat-card" id="chat-card-${chat.id}">
+                    <div class="chat-main">
+                        <div class="chat-title">${chat.title}</div>
+                        <div class="chat-date">${formatDate(chat.created_at)}</div>
+                    </div>
+                    <div class="chat-meta">
+                        <span>
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16ZM9 5a1 1 0 1 1 2 0v1h1a1 1 0 1 1 0 2h-2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm1 4a1 1 0 1 0 0 2h1a1 1 0 1 0 0-2h-1Zm-1 5a1 1 0 1 1 2 0v1h1a1 1 0 1 1 0 2h-2a1 1 0 0 1-1-1v-1a1 1 0 0 1 1-1Z" clip-rule="evenodd" /></svg>
+                            ${chat.response_count || 0} responses
+                        </span>
+                        <span>
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path d="M2 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4Zm10.5 0a2.5 2.5 0 0 0-2.5 2.5V15a3.5 3.5 0 0 0 3.5 3.5h.5a2.5 2.5 0 0 0 2.5-2.5V6.5A2.5 2.5 0 0 0 14 4h-1.5Z" /></svg>
+                            ${chat.file_count || 0} files
+                        </span>
+                    </div>
+                    <div class="chat-actions">
+                         <button class="action-btn" onclick="editChatTitle(event, '${chat.id}', '${chat.title}')">Edit</button>
+                         <button class="action-btn delete" onclick="deleteChat(event, '${chat.id}')">Delete</button>
+                         <a href="chat_interface.html?chat_id=${chat.id}" class="open-chat-btn">Open Chat</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function createNewChat() {
+            const title = prompt("Enter a title for your new chat:", "New Chat");
+            if (!title) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/chats`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        // If no user_id, the backend will create one
+                        user_id: currentUserId,
+                        title: title
+                    })
+                });
+                
+                if (!response.ok) throw new Error('Failed to create chat.');
+
+                const newChat = await response.json();
+
+                // If this is the first chat for a new user, save their ID
+                if (!currentUserId) {
+                    currentUserId = newChat.user_id;
+                    localStorage.setItem('userId', currentUserId);
+                }
+
+                // Open the new chat immediately
+                window.location.href = `chat_interface.html?chat_id=${newChat.id}`;
+
+            } catch (error) {
+                console.error('Error creating new chat:', error);
+                alert('Could not create a new chat.');
+            }
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return 'Just now';
+            const date = new Date(dateString);
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            if (date.toDateString() === today.toDateString()) {
+                return 'Today';
+            }
+            if (date.toDateString() === yesterday.toDateString()) {
+                return 'Yesterday';
+            }
+            return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+        }
+
+        function showCreateChatModal() {
+            document.getElementById('create-chat-modal').classList.add('show');
+            document.getElementById('new-chat-title').focus();
+        }
+
+        function hideCreateChatModal() {
+            document.getElementById('create-chat-modal').classList.remove('show');
+            document.getElementById('new-chat-title').value = '';
+        }
+
+        function showDeleteChatModal(chatId, chatTitle) {
+            chatToDelete = chatId;
+            document.getElementById('delete-chat-name').textContent = chatTitle;
+            document.getElementById('delete-chat-modal').classList.add('show');
+        }
+
+        function hideDeleteChatModal() {
+            document.getElementById('delete-chat-modal').classList.remove('show');
+            chatToDelete = null;
+        }
+
+        async function confirmDeleteChat() {
+            if (!chatToDelete) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/chats/${chatToDelete}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    hideDeleteChatModal();
+                    await loadUserChats();
+                } else {
+                    throw new Error(result.detail || 'Failed to delete chat');
+                }
+            } catch (error) {
+                alert('Error deleting chat: ' + error.message);
+            }
+        }
+
+        async function editChatTitle(event, chatId, currentTitle) {
+            event.stopPropagation(); // prevent card click-through
+            const newTitle = prompt("Enter the new title for the chat:", currentTitle);
+            if (!newTitle || newTitle.trim() === "" || newTitle.trim() === currentTitle) {
+                return; // Abort if no change or user cancels
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/chats/${chatId}/title`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ title: newTitle.trim() })
+                });
+
+                if (!response.ok) throw new Error('Failed to update title.');
+                
+                await response.json();
+                
+                // Refresh just the title on the card to avoid a full reload
+                const chatCard = document.querySelector(`#chat-card-${chatId} .chat-title`);
+                if (chatCard) {
+                    chatCard.textContent = newTitle.trim();
+                } else {
+                    await loadUserChats(); // Fallback to full reload
+                }
+
+            } catch(error) {
+                console.error('Error updating chat title:', error);
+                alert('Could not update the chat title.');
+            }
+        }
+
+        async function deleteChat(event, chatId) {
+            event.stopPropagation(); // prevent card click-through
+            if (!confirm("Are you sure you want to delete this chat? This action cannot be undone.")) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/chats/${chatId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) throw new Error('Failed to delete chat.');
+
+                await response.json();
+
+                // Remove the card from the UI
+                const chatCard = document.getElementById(`chat-card-${chatId}`);
+                if (chatCard) {
+                    chatCard.style.transition = 'opacity 0.3s ease';
+                    chatCard.style.opacity = '0';
+                    setTimeout(() => chatCard.remove(), 300);
+                } else {
+                     await loadUserChats(); // Fallback to full reload
+                }
+
+            } catch(error) {
+                console.error('Error deleting chat:', error);
+                alert('Could not delete the chat.');
+            }
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                e.preventDefault();
+                showCreateChatModal();
+            }
+            
+            if (e.key === 'Escape') {
+                hideCreateChatModal();
+                hideDeleteChatModal();
+            }
         });
     </script>
 </body>
-</html> 
+</html>
+

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Transcription Chat</title>
+    <title>Open Record - Chat</title>
     <style>
         * {
             margin: 0;
@@ -47,7 +47,7 @@
 
         .panel-subtitle {
             font-size: 12px;
-            color: #64748b;
+            color: #4B5563; /* Slate Gray */
         }
 
         .responses-container {
@@ -70,8 +70,12 @@
         }
 
         .response-item.selected {
-            background: #3b82f6;
+            background: #1A2B4C; /* Navy Blue */
             color: white;
+        }
+
+        .response-item.selected .response-preview {
+            color: #e2e8f0;
         }
 
         .response-title {
@@ -88,10 +92,6 @@
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
-        }
-
-        .response-item.selected .response-preview {
-            color: #e2e8f0;
         }
 
         /* Middle Panel - Chat */
@@ -114,7 +114,7 @@
         }
 
         .dashboard-btn {
-            background: #3b82f6;
+            background: #4B5563; /* Slate Gray */
             color: white;
             border: none;
             border-radius: 8px;
@@ -129,7 +129,7 @@
         }
 
         .dashboard-btn:hover {
-            background: #2563eb;
+            background: #374151; /* Darker Slate Gray */
         }
 
         .chat-info {
@@ -140,13 +140,13 @@
         .chat-title {
             font-size: 18px;
             font-weight: 600;
-            color: #1e293b;
+            color: #1A2B4C; /* Navy Blue */
             margin-bottom: 4px;
         }
 
         .chat-subtitle {
             font-size: 12px;
-            color: #64748b;
+            color: #4B5563; /* Slate Gray */
         }
 
         .chat-container {
@@ -155,86 +155,144 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
+            gap: 16px;
         }
 
         .chat-message {
-            margin-bottom: 16px;
-            max-width: 80%;
+            display: flex;
+            gap: 12px;
+            max-width: 85%;
         }
 
         .chat-message.user {
             align-self: flex-end;
+            flex-direction: row-reverse;
         }
 
         .chat-message.ai {
             align-self: flex-start;
         }
 
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
         .message-bubble {
             padding: 12px 16px;
             border-radius: 18px;
             font-size: 14px;
-            line-height: 1.4;
+            line-height: 1.5;
+            word-wrap: break-word;
         }
 
         .message-bubble.user {
-            background: #3b82f6;
+            background: #1A2B4C; /* Navy Blue */
             color: white;
+            border-bottom-right-radius: 4px;
         }
 
         .message-bubble.ai {
             background: #f1f5f9;
             color: #1e293b;
+            border-bottom-left-radius: 4px;
+        }
+
+        .ai-message-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+
+        .save-btn {
+            background: none;
+            border: 1px solid #cbd5e1;
+            color: #4B5563; /* Slate Gray */
+            padding: 2px 8px;
+            font-size: 11px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .save-btn:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+        }
+
+        .save-btn.saved {
+            background: #FFFBEB; /* Light Goldenrod */
+            color: #92400E; /* Dark Goldenrod Text */
+            border-color: #FBBF24; /* Goldenrod Border */
+        }
+
+        #suggested-questions-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 12px;
+        }
+
+        .suggested-question-btn {
+            background: #FEF3C7; /* Lighter Goldenrod */
+            color: #92400E; /* Dark Goldenrod Text */
+            border: 1px solid #FDE68A; /* Light Goldenrod Border */
+            border-radius: 16px;
+            padding: 6px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .suggested-question-btn:hover {
+            background: #FDE68A; /* Light Goldenrod */
+            border-color: #FBBF24; /* Goldenrod */
         }
 
         .chat-input-container {
-            padding: 20px;
+            padding: 16px 24px;
             border-top: 1px solid #e2e8f0;
             background: #ffffff;
         }
 
         .chat-input-wrapper {
             display: flex;
+            align-items: center;
             gap: 12px;
-            align-items: flex-end;
         }
 
         .chat-input {
-            flex: 1;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
+            flex-grow: 1;
             padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
             font-size: 14px;
-            resize: none;
-            min-height: 44px;
-            max-height: 120px;
             font-family: inherit;
         }
 
-        .chat-input:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .send-button {
-            background: #3b82f6;
-            color: white;
-            border: none;
-            border-radius: 8px;
+        .send-btn {
             padding: 12px 20px;
-            font-size: 14px;
-            font-weight: 500;
+            border: none;
+            background-color: #D4A017; /* Goldenrod */
+            color: white;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: background-color 0.2s;
         }
-
-        .send-button:hover {
-            background: #2563eb;
+        .send-btn:hover {
+            background-color: #B8860B; /* Darker Goldenrod */
         }
-
-        .send-button:disabled {
-            background: #9ca3af;
+        .send-btn:disabled {
+            background-color: #9ca3af;
             cursor: not-allowed;
         }
 
@@ -258,7 +316,7 @@
 
         .upload-btn {
             width: 100%;
-            background: #10b981;
+            background: #1A2B4C; /* Navy Blue */
             color: white;
             border: none;
             border-radius: 8px;
@@ -267,10 +325,13 @@
             font-weight: 500;
             cursor: pointer;
             transition: background 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .upload-btn:hover {
-            background: #059669;
+            background: #111D33; /* Darker Navy */
         }
 
         .files-container {
@@ -295,8 +356,8 @@
         }
 
         .file-item.selected {
-            background: #dbeafe;
-            border-color: #3b82f6;
+            background: #FEF3C7; /* Lighter Goldenrod */
+            border-color: #D4A017; /* Goldenrod */
         }
 
         .file-name {
@@ -310,7 +371,7 @@
             display: flex;
             gap: 12px;
             font-size: 12px;
-            color: #64748b;
+            color: #4B5563; /* Slate Gray */
         }
 
         .file-actions {
@@ -320,7 +381,7 @@
         }
 
         .file-action-btn {
-            background: #3b82f6;
+            background: #4B5563; /* Slate Gray */
             color: white;
             border: none;
             border-radius: 4px;
@@ -331,7 +392,7 @@
         }
 
         .file-action-btn:hover {
-            background: #2563eb;
+            background: #374151; /* Darker Slate Gray */
         }
 
         .file-action-btn.remove {
@@ -355,7 +416,7 @@
             width: 20px;
             height: 20px;
             border: 2px solid #e2e8f0;
-            border-top: 2px solid #3b82f6;
+            border-top: 2px solid #1A2B4C; /* Navy Blue */
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin-right: 8px;
@@ -416,7 +477,7 @@
         <div class="middle-panel">
             <div class="chat-header">
                 <div class="chat-header-left">
-                    <a href="dashboard.html" class="dashboard-btn">📊 Dashboard</a>
+                    <a href="/" class="dashboard-btn">📊 Dashboard</a>
                     <div class="chat-info">
                         <div class="chat-title" id="chat-title">New Chat</div>
                         <div class="chat-subtitle" id="chat-subtitle">Start a conversation about your files</div>
@@ -425,20 +486,16 @@
             </div>
             <div class="chat-container" id="chat-container">
                 <div class="empty-state">
-                    <div class="empty-state-icon">💬</div>
-                    <div class="empty-state-title">Start a new conversation</div>
-                    <div class="empty-state-subtitle">Select files from the right panel and ask questions about them</div>
+                    <div class="empty-state-icon">👈</div>
+                    <div class="empty-state-title">No chat is active</div>
+                    <div class="empty-state-subtitle">Please select a chat from your <a href="dashboard.html">dashboard</a>.</div>
                 </div>
             </div>
             <div class="chat-input-container">
+                <div id="suggested-questions-container" style="display: none;"></div>
                 <div class="chat-input-wrapper">
-                    <textarea 
-                        class="chat-input" 
-                        id="chat-input" 
-                        placeholder="Ask a question about your files..."
-                        rows="1"
-                    ></textarea>
-                    <button class="send-button" id="send-button" disabled>Send</button>
+                    <input type="text" id="chat-input" class="chat-input" placeholder="Ask a question about the selected files...">
+                    <button id="send-btn" class="send-btn">Send</button>
                 </div>
             </div>
         </div>
@@ -450,9 +507,9 @@
                 <div class="panel-subtitle">Upload and manage your audio/video files</div>
             </div>
             <div class="file-upload-section">
-                <input type="file" id="file-input" class="file-input" accept=".mp3,.mp4,.wav,.m4a,.flac,.ogg,.webm">
+                <input type="file" id="file-input" class="file-input" accept=".mp3,.mp4,.wav,.m4a,.flac,.ogg,.webm,.pdf,.txt,.md,.json,.csv,.html,.xml,.log,.py,.js,.java,.cpp,.sql">
                 <button class="upload-btn" onclick="document.getElementById('file-input').click()">
-                    📁 Upload New File
+                    📁 Upload File
                 </button>
             </div>
             <div class="files-container" id="files-container">
@@ -467,458 +524,452 @@
     <script>
         const API_BASE = 'http://localhost:8000';
         let currentChatId = null;
-        let currentUserId = 'demo-user-123'; // In a real app, this would come from auth
+        let currentUserId = null; 
         let selectedFiles = new Set();
         let selectedResponseId = null;
+        let eventSource = null;
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
+            currentUserId = localStorage.getItem('userId');
+            if (!currentUserId) {
+                alert("No user session found. Please create a chat from the dashboard first.");
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
             // Check if a specific chat is requested via URL parameter
             const urlParams = new URLSearchParams(window.location.search);
             const requestedChatId = urlParams.get('chat_id');
             
             if (requestedChatId) {
-                // Open the specific chat
                 currentChatId = requestedChatId;
-                loadSpecificChat(requestedChatId);
+                loadChatDetails(currentChatId);
             } else {
-                // Create a new chat
-                createNewChat();
+                // If no chat_id is provided, you might want to redirect to the dashboard
+                // or have a clearer UI state. For now, we'll show an empty state.
+                showEmptyChatState();
             }
             
-            loadUserFiles();
             setupFileUpload();
             setupChatInput();
         });
 
-        // Load a specific chat
-        async function loadSpecificChat(chatId) {
+        function showEmptyChatState() {
+            document.getElementById('chat-title').textContent = "No Chat Selected";
+            document.getElementById('chat-subtitle').textContent = "Go to the dashboard to open or create a chat.";
+            document.getElementById('chat-container').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">👈</div>
+                    <div class="empty-state-title">No chat is active</div>
+                    <div class="empty-state-subtitle">Please select a chat from your <a href="dashboard.html">dashboard</a>.</div>
+                </div>`;
+            document.getElementById('chat-input').disabled = true;
+            document.getElementById('send-btn').disabled = true;
+        }
+
+        async function loadChatDetails(chatId) {
             try {
+                // You might need a specific endpoint to get just chat details
+                // Assuming one exists at /chats/details/{chatId}
                 const response = await fetch(`${API_BASE}/chats/chat/${chatId}`);
+                if (!response.ok) throw new Error('Chat not found');
                 const chat = await response.json();
+
+                document.getElementById('chat-title').textContent = chat.title || 'Chat';
+                document.getElementById('chat-subtitle').textContent = ''; // No longer show the chat ID
                 
-                if (chat) {
-                    updateChatTitle(chat.title);
-                    await loadChatResponses();
-                    await loadChatFiles();
-                } else {
-                    throw new Error('Chat not found');
-                }
+                // Load messages for this chat
+                loadChatMessages(chatId);
+                // Now load files and responses specific to this chat
+                loadChatFiles(chatId);
+                loadSavedResponses(chatId);
+
             } catch (error) {
-                console.error('Failed to load specific chat:', error);
-                // Fallback to creating a new chat
-                createNewChat();
+                console.error('Failed to load chat details:', error);
+                showEmptyChatState();
+                alert('Could not load the specified chat. It may have been deleted.');
             }
         }
 
-        // Load files associated with the current chat
-        async function loadChatFiles() {
-            if (!currentChatId) return;
+        async function loadChatMessages(chatId) {
+            // This function would load previous messages. Placeholder for now.
+            const chatContainer = document.getElementById('chat-container');
+            chatContainer.innerHTML = ''; // Clear loading/empty state
+        }
+        
+        async function loadChatFiles(chatId) {
+            const filesContainer = document.getElementById('files-container');
+            filesContainer.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading files...
+                </div>`;
 
             try {
-                const response = await fetch(`${API_BASE}/chats/${currentChatId}/files`);
+                const response = await fetch(`${API_BASE}/chats/${chatId}/files`);
+                if (!response.ok) throw new Error('Failed to fetch files.');
+
                 const data = await response.json();
-                
-                if (data.files && data.files.length > 0) {
-                    // Add chat files to selected files
-                    data.files.forEach(file => {
-                        selectedFiles.add(file.id);
-                    });
-                    updateFileSelection();
-                    updateChatSubtitle();
-                }
-            } catch (error) {
-                console.error('Failed to load chat files:', error);
-            }
-        }
+                const files = data.files || [];
 
-        // Chat management
-        async function createNewChat() {
-            try {
-                const response = await fetch(`${API_BASE}/chats`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        user_id: currentUserId,
-                        title: 'New Chat'
-                    })
-                });
-
-                const result = await response.json();
-                if (result.success) {
-                    currentChatId = result.chat_id;
-                    updateChatTitle('New Chat');
-                    loadChatResponses();
-                }
-            } catch (error) {
-                console.error('Failed to create chat:', error);
-            }
-        }
-
-        async function loadChatResponses() {
-            if (!currentChatId) return;
-
-            const container = document.getElementById('responses-container');
-            
-            try {
-                const response = await fetch(`${API_BASE}/chats/${currentChatId}/responses`);
-                const data = await response.json();
-                
-                if (data.responses && data.responses.length > 0) {
-                    container.innerHTML = data.responses.map(response => `
-                        <div class="response-item" data-id="${response.id}" onclick="selectResponse('${response.id}')">
-                            <div class="response-title">${response.user_message.substring(0, 50)}${response.user_message.length > 50 ? '...' : ''}</div>
-                            <div class="response-preview">${response.ai_response.substring(0, 100)}${response.ai_response.length > 100 ? '...' : ''}</div>
-                        </div>
-                    `).join('');
+                if (files.length > 0) {
+                    displayFiles(files);
                 } else {
-                    container.innerHTML = `
+                    filesContainer.innerHTML = `
                         <div class="empty-state">
-                            <div class="empty-state-icon">💭</div>
-                            <div class="empty-state-title">No responses yet</div>
-                            <div class="empty-state-subtitle">Start chatting to see your conversation history</div>
-                        </div>
-                    `;
+                            <div class="empty-state-icon">📂</div>
+                            <h3 class="empty-state-title">No Files Uploaded</h3>
+                            <p class="empty-state-subtitle">Upload your first file to get started.</p>
+                        </div>`;
                 }
             } catch (error) {
-                container.innerHTML = `
+                console.error('Error loading files:', error);
+                filesContainer.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-state-icon">❌</div>
-                        <div class="empty-state-title">Error loading responses</div>
-                        <div class="empty-state-subtitle">${error.message}</div>
+                        <div class="empty-state-icon">😥</div>
+                        <h3 class="empty-state-title">Error</h3>
+                        <p class="empty-state-subtitle">Could not load files.</p>
+                    </div>`;
+            }
+        }
+
+        function displayFiles(files) {
+            const filesContainer = document.getElementById('files-container');
+            filesContainer.innerHTML = files.map(file => `
+                <div class="file-item" data-file-id="${file.id}">
+                    <div class="file-name">${file.filename}</div>
+                    <div class="file-meta">
+                        <span>${(file.file_size_mb || 0).toFixed(2)} MB</span>
+                        <span>${file.language || 'N/A'}</span>
                     </div>
-                `;
-            }
-        }
-
-        function selectResponse(responseId) {
-            selectedResponseId = responseId;
-            document.querySelectorAll('.response-item').forEach(item => {
-                item.classList.remove('selected');
-            });
-            document.querySelector(`[data-id="${responseId}"]`).classList.add('selected');
-            
-            // Load the specific response in the chat
-            loadSpecificResponse(responseId);
-        }
-
-        async function loadSpecificResponse(responseId) {
-            if (!currentChatId) return;
-
-            try {
-                const response = await fetch(`${API_BASE}/chats/${currentChatId}/responses`);
-                const data = await response.json();
-                
-                const specificResponse = data.responses.find(r => r.id === responseId);
-                if (specificResponse) {
-                    displayChatMessage(specificResponse.user_message, 'user');
-                    displayChatMessage(specificResponse.ai_response, 'ai');
-                }
-            } catch (error) {
-                console.error('Failed to load specific response:', error);
-            }
-        }
-
-        // File management
-        async function loadUserFiles() {
-            const container = document.getElementById('files-container');
-            
-            try {
-                const response = await fetch(`${API_BASE}/users/${currentUserId}/files`);
-                const data = await response.json();
-                
-                if (data.files && data.files.length > 0) {
-                    container.innerHTML = data.files.map(file => `
-                        <div class="file-item" data-id="${file.id}" onclick="toggleFileSelection('${file.id}')">
-                            <div class="file-name">${file.filename}</div>
-                            <div class="file-meta">
-                                <span class="file-duration">${formatDuration(file.duration)}</span>
-                                <span class="file-size">${file.file_size_mb.toFixed(1)}MB</span>
-                                <span class="file-date">${formatDate(file.created_at)}</span>
-                            </div>
-                            <div class="file-actions">
-                                <button class="file-action-btn" onclick="event.stopPropagation(); viewFile('${file.id}')">
-                                    👁️ View
-                                </button>
-                                <button class="file-action-btn" onclick="event.stopPropagation(); addFileToChat('${file.id}')">
-                                    ➕ Add
-                                </button>
-                            </div>
-                        </div>
-                    `).join('');
-                } else {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-state-icon">📁</div>
-                            <div class="empty-state-title">No files uploaded yet</div>
-                            <div class="empty-state-subtitle">Upload your first file to get started</div>
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">❌</div>
-                        <div class="empty-state-title">Error loading files</div>
-                        <div class="empty-state-subtitle">${error.message}</div>
+                    <div class="file-actions">
+                        <button class="file-action-btn" onclick="event.stopPropagation(); window.open('view_transcription.html?id=${file.id}', '_blank');">View</button>
                     </div>
-                `;
-            }
-        }
+                </div>
+            `).join('');
 
-        async function addFileToChat(fileId) {
-            if (!currentChatId) return;
-
-            try {
-                const response = await fetch(`${API_BASE}/chats/${currentChatId}/files`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        transcription_id: fileId
-                    })
-                });
-
-                const result = await response.json();
-                if (result.success) {
-                    selectedFiles.add(fileId);
-                    updateFileSelection();
-                    updateChatSubtitle();
-                }
-            } catch (error) {
-                console.error('Failed to add file to chat:', error);
-            }
-        }
-
-        async function removeFileFromChat(fileId) {
-            if (!currentChatId) return;
-
-            try {
-                const response = await fetch(`${API_BASE}/chats/${currentChatId}/files/${fileId}`, {
-                    method: 'DELETE'
-                });
-
-                const result = await response.json();
-                if (result.success) {
-                    selectedFiles.delete(fileId);
-                    updateFileSelection();
-                    updateChatSubtitle();
-                }
-            } catch (error) {
-                console.error('Failed to remove file from chat:', error);
-            }
-        }
-
-        function toggleFileSelection(fileId) {
-            const fileItem = document.querySelector(`[data-id="${fileId}"]`);
-            if (!fileItem) return;
-            
-            if (selectedFiles.has(fileId)) {
-                selectedFiles.delete(fileId);
-                fileItem.classList.remove('selected');
-            } else {
-                selectedFiles.add(fileId);
-                fileItem.classList.add('selected');
-            }
-            updateChatSubtitle();
-        }
-
-        function updateFileSelection() {
+            // Add click listeners to file items
             document.querySelectorAll('.file-item').forEach(item => {
-                const fileId = item.dataset.id;
-                if (selectedFiles.has(fileId)) {
-                    item.classList.add('selected');
-                } else {
-                    item.classList.remove('selected');
-                }
+                item.addEventListener('click', () => {
+                    const fileId = item.dataset.fileId;
+                    item.classList.toggle('selected');
+                    if (selectedFiles.has(fileId)) {
+                        selectedFiles.delete(fileId);
+                    } else {
+                        selectedFiles.add(fileId);
+                    }
+                    fetchAndDisplaySuggestedQuestions(Array.from(selectedFiles));
+                });
             });
         }
+        
+        async function fetchAndDisplaySuggestedQuestions(fileIds) {
+            const container = document.getElementById('suggested-questions-container');
+            if (fileIds.length === 0) {
+                container.innerHTML = '';
+                container.style.display = 'none';
+                return;
+            }
 
-        // File upload handling
+            container.style.display = 'flex';
+            container.innerHTML = '<div class="loading" style="padding: 0; font-size: 13px;"><div class="spinner" style="margin-right: 6px;"></div><span>Generating possible questions...</span></div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/suggest-questions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ file_ids: fileIds })
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch suggestions.');
+
+                const data = await response.json();
+                const questions = data.suggested_questions || [];
+
+                if (questions.length > 0) {
+                    container.innerHTML = questions.map(q => 
+                        `<button class="suggested-question-btn">${q}</button>`
+                    ).join('');
+
+                    document.querySelectorAll('.suggested-question-btn').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const chatInput = document.getElementById('chat-input');
+                            chatInput.value = btn.textContent;
+                            document.getElementById('send-btn').click();
+                        });
+                    });
+
+                } else {
+                    container.innerHTML = '';
+                    container.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error fetching suggested questions:', error);
+                container.innerHTML = '<span style="font-size: 12px; color: #ef4444;">Could not generate suggestions.</span>';
+            }
+        }
+        
         function setupFileUpload() {
             const fileInput = document.getElementById('file-input');
-            
-            fileInput.addEventListener('change', async function(e) {
-                const file = e.target.files[0];
+            const uploadBtn = document.querySelector('.upload-btn');
+
+            fileInput.addEventListener('change', async (event) => {
+                const file = event.target.files[0];
                 if (!file) return;
 
-                const container = document.getElementById('files-container');
-                container.innerHTML = `
-                    <div class="loading">
-                        <div class="spinner"></div>
-                        Uploading and transcribing...
-                    </div>
-                `;
+                if (!currentChatId || !currentUserId) {
+                    alert('Cannot upload file: active chat or user is not set. Please go to the dashboard.');
+                    return;
+                }
+
+                const originalBtnText = uploadBtn.innerHTML;
+                uploadBtn.disabled = true;
+                uploadBtn.innerHTML = '<div class="spinner" style="border-top-color: white; width: 16px; height: 16px; margin-right: 8px;"></div> Uploading...';
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('user_id', currentUserId);
+                formData.append('chat_id', currentChatId);
 
                 try {
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    formData.append('language', 'en');
-
-                    const response = await fetch(`${API_BASE}/transcribe/upload`, {
+                    const response = await fetch(`${API_BASE}/upload`, {
                         method: 'POST',
                         body: formData
                     });
 
-                    const result = await response.json();
-
-                    if (result.success) {
-                        // Store transcription with user_id
-                        const storageResponse = await fetch(`${API_BASE}/store-transcription`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                transcription_data: result,
-                                user_id: currentUserId
-                            })
-                        });
-                        
-                        const storageResult = await storageResponse.json();
-                        if (!storageResult.success) {
-                            console.warn('Failed to store transcription:', storageResult);
-                        }
-                        
-                        // Reload files after successful upload
-                        await loadUserFiles();
-                    } else {
-                        throw new Error(result.error || 'Upload failed');
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.detail || 'Upload failed');
                     }
+                    
+                    const result = await response.json();
+                    console.log('Upload successful:', result);
+                    
+                    // Refresh the file list to show the new file
+                    await loadChatFiles(currentChatId);
+
                 } catch (error) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-state-icon">❌</div>
-                            <div class="empty-state-title">Upload failed</div>
-                            <div class="empty-state-subtitle">${error.message}</div>
-                        </div>
-                    `;
+                    console.error('Upload error:', error);
+                    alert(`Error uploading file: ${error.message}`);
+                } finally {
+                    uploadBtn.disabled = false;
+                    uploadBtn.innerHTML = originalBtnText;
+                    fileInput.value = ''; // Reset file input
                 }
             });
         }
 
-        // Chat functionality
         function setupChatInput() {
+            const sendBtn = document.getElementById('send-btn');
             const chatInput = document.getElementById('chat-input');
-            const sendButton = document.getElementById('send-button');
-            
-            // Auto-resize textarea
-            chatInput.addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-                updateSendButton();
-            });
+            const chatContainer = document.getElementById('chat-container');
 
-            // Handle Enter key
-            chatInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
+            sendBtn.addEventListener('click', handleSend);
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleSend();
                 }
             });
 
-            // Send button click
-            sendButton.addEventListener('click', sendMessage);
-        }
+            async function handleSend() {
+                const query = chatInput.value.trim();
+                if (!query) return;
 
-        function updateSendButton() {
-            const chatInput = document.getElementById('chat-input');
-            const sendButton = document.getElementById('send-button');
-            const hasText = chatInput.value.trim().length > 0;
-            const hasFiles = selectedFiles.size > 0;
-            
-            sendButton.disabled = !hasText || !hasFiles;
-        }
+                if (selectedFiles.size === 0) {
+                    alert('Please select at least one file to ask questions about.');
+                    return;
+                }
 
-        async function sendMessage() {
-            const chatInput = document.getElementById('chat-input');
-            const message = chatInput.value.trim();
-            
-            if (!message || selectedFiles.size === 0) return;
+                chatInput.value = '';
+                chatInput.disabled = true;
+                sendBtn.disabled = true;
 
-            // Display user message
-            displayChatMessage(message, 'user');
-            
-            // Clear input
-            chatInput.value = '';
-            chatInput.style.height = 'auto';
-            updateSendButton();
+                appendMessage('user', query);
 
-            // Show loading state
-            const loadingId = displayChatMessage('Thinking...', 'ai', true);
-
-            try {
-                // For now, we'll create a simple response
-                // In a real implementation, this would call an AI service
-                const aiResponse = `I understand you're asking about your files. You have ${selectedFiles.size} file(s) selected. This is a placeholder response - in a real implementation, I would analyze your files and provide a detailed answer to: "${message}"`;
-
-                // Remove loading message
-                removeChatMessage(loadingId);
+                const aiMessageBubble = appendMessage('ai', '<span class="thinking">...</span>');
                 
-                // Display AI response
-                displayChatMessage(aiResponse, 'ai');
+                let fullResponseText = '';
+                let isFirstChunk = true;
 
-                // Save to chat history
-                await saveChatResponse(message, aiResponse);
+                try {
+                    const response = await fetch(`${API_BASE}/query`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            query: query,
+                            chat_id: currentChatId,
+                            file_ids: Array.from(selectedFiles)
+                        })
+                    });
 
-                // Reload responses
-                await loadChatResponses();
+                    if (!response.ok) {
+                        throw new Error(`Server error: ${response.statusText}`);
+                    }
+                    
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    let buffer = '';
 
-            } catch (error) {
-                removeChatMessage(loadingId);
-                displayChatMessage('Sorry, I encountered an error. Please try again.', 'ai');
-                console.error('Chat error:', error);
+                    while (true) {
+                        const { value, done } = await reader.read();
+                        if (done) break;
+                        
+                        buffer += decoder.decode(value, { stream: true });
+                        const parts = buffer.split('\\n\\n');
+                        buffer = parts.pop();
+
+                        for (const part of parts) {
+                            if (part.startsWith('data: ')) {
+                                const dataStr = part.substring(6).trim();
+                                if (dataStr === '[DONE]') continue;
+
+                                try {
+                                    const data = JSON.parse(dataStr);
+                                    
+                                    if (isFirstChunk) {
+                                        aiMessageBubble.innerHTML = '';
+                                        isFirstChunk = false;
+                                    }
+
+                                    if (data.content) {
+                                        fullResponseText += data.content;
+                                        aiMessageBubble.innerHTML = fullResponseText.replace(/\\n/g, '<br>');
+                                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                                    } else if (data.error) {
+                                        fullResponseText = `<span style="color: red;">Error: ${data.error}</span>`;
+                                        aiMessageBubble.innerHTML = fullResponseText;
+                                        break;
+                                    }
+                                } catch (e) {
+                                    console.error("Failed to parse SSE data chunk:", dataStr, e);
+                                }
+                            }
+                        }
+                    }
+
+                    if (buffer.startsWith('data: ')) {
+                        const dataStr = buffer.substring(6).trim();
+                        try {
+                            const data = JSON.parse(dataStr);
+                            if (data.content) {
+                                fullResponseText += data.content;
+                                aiMessageBubble.innerHTML = fullResponseText.replace(/\\n/g, '<br>');
+                            }
+                        } catch (e) {
+                            console.error("Failed to parse final SSE chunk:", dataStr, e);
+                        }
+                    }
+
+                    // After the stream is complete, log the response to the DB
+                    await logResponseToDatabase(currentChatId, query, fullResponseText, aiMessageBubble, Array.from(selectedFiles));
+
+                } catch (error) {
+                    console.error('Query error:', error);
+                    aiMessageBubble.innerHTML = `Sorry, an error occurred: ${error.message}`;
+                    aiMessageBubble.style.color = 'red';
+                } finally {
+                    chatInput.disabled = false;
+                    sendBtn.disabled = false;
+                    chatInput.focus();
+                }
             }
         }
 
-        function displayChatMessage(message, type, isLoading = false) {
-            const container = document.getElementById('chat-container');
-            const messageId = 'msg-' + Date.now();
-            
-            const messageHtml = `
-                <div class="chat-message ${type}" id="${messageId}">
-                    <div class="message-bubble ${type}">
-                        ${isLoading ? '<div class="spinner"></div>' : ''}
-                        ${message}
-                    </div>
-                </div>
-            `;
-            
-            container.insertAdjacentHTML('beforeend', messageHtml);
-            container.scrollTop = container.scrollHeight;
-            
-            return messageId;
-        }
-
-        function removeChatMessage(messageId) {
-            const message = document.getElementById(messageId);
-            if (message) {
-                message.remove();
-            }
-        }
-
-        async function saveChatResponse(userMessage, aiResponse) {
-            if (!currentChatId) return;
+        async function logResponseToDatabase(chatId, userMessage, aiResponse, aiBubbleElement, fileIds = []) {
+            if (!aiResponse.trim()) return;
 
             try {
-                await fetch(`${API_BASE}/chats/${currentChatId}/responses`, {
+                const formData = new FormData();
+                formData.append('user_message', userMessage);
+                formData.append('ai_response', aiResponse);
+                formData.append('metadata', JSON.stringify({ file_ids: fileIds }));
+
+                const response = await fetch(`${API_BASE}/chats/${chatId}/responses`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        user_message: userMessage,
-                        ai_response: aiResponse,
-                        response_type: 'text',
-                        metadata: '{}'
-                    })
+                    body: formData
                 });
+                
+                if (!response.ok) throw new Error('Failed to log response.');
+
+                const data = await response.json();
+                const responseId = data.response_id;
+
+                if (responseId) {
+                    aiBubbleElement.dataset.responseId = responseId;
+                    appendSaveButton(aiBubbleElement, responseId, false);
+                }
+
             } catch (error) {
-                console.error('Failed to save chat response:', error);
+                console.error('Error logging response to DB:', error);
             }
+        }
+
+        function appendSaveButton(bubbleElement, responseId, isInitiallySaved) {
+            const footer = document.createElement('div');
+            footer.className = 'ai-message-footer';
+
+            const saveBtn = document.createElement('button');
+            saveBtn.className = 'save-btn';
+            saveBtn.textContent = isInitiallySaved ? 'Saved' : 'Save';
+            if (isInitiallySaved) {
+                saveBtn.classList.add('saved');
+            }
+
+            saveBtn.addEventListener('click', async () => {
+                const isSaved = saveBtn.classList.contains('saved');
+                const endpoint = isSaved ? `/responses/${responseId}/unsave` : `/responses/${responseId}/save`;
+
+                try {
+                    const response = await fetch(`${API_BASE}${endpoint}`, { method: 'POST' });
+                    if (!response.ok) throw new Error('API call failed');
+                    
+                    saveBtn.classList.toggle('saved');
+                    saveBtn.textContent = isSaved ? 'Save' : 'Saved';
+                    
+                    // Refresh the saved responses list
+                    await loadSavedResponses(currentChatId);
+
+                } catch (error) {
+                    console.error('Error toggling save state:', error);
+                    alert('Could not update save state.');
+                }
+            });
+
+            footer.appendChild(saveBtn);
+            bubbleElement.appendChild(footer);
+        }
+
+        function appendMessage(role, content, id = null) {
+            const chatContainer = document.getElementById('chat-container');
+            
+            // If it's the first message, clear the empty state
+            if (chatContainer.querySelector('.empty-state')) {
+                chatContainer.innerHTML = '';
+            }
+
+            const messageWrapper = document.createElement('div');
+            messageWrapper.className = `chat-message ${role}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.textContent = role === 'user' ? '👤' : '🤖';
+
+            const bubble = document.createElement('div');
+            bubble.className = `message-bubble ${role}`;
+            bubble.innerHTML = content;
+            if (id) {
+                bubble.id = id;
+            }
+
+            messageWrapper.appendChild(avatar);
+            messageWrapper.appendChild(bubble);
+            chatContainer.appendChild(messageWrapper);
+
+            // Scroll to bottom
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            return bubble; // Return the bubble for streaming updates
         }
 
         function updateChatTitle(title) {
@@ -954,12 +1005,51 @@
         }
 
         function formatDate(dateString) {
+            if (!dateString) return 'N/A';
             const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric',
-                year: 'numeric'
-            });
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        async function loadSavedResponses(chatId) {
+            const container = document.getElementById('responses-container');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
+
+            if (!chatId) {
+                container.innerHTML = '<div class="empty-state"><p>No chat loaded.</p></div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/chats/${chatId}/responses/saved`);
+                if (!response.ok) throw new Error('Failed to fetch saved responses.');
+                
+                const data = await response.json();
+                const savedResponses = data.saved_responses || [];
+
+                if (savedResponses.length === 0) {
+                    container.innerHTML = '<div class="empty-state" style="padding: 20px;"><div class="empty-state-title">No Saved Responses</div><p>Click the "Save" button below an AI response to keep it here.</p></div>';
+                    return;
+                }
+
+                container.innerHTML = savedResponses.map(res => `
+                    <div class="response-item" data-response-id="${res.id}">
+                        <div class="response-title">${res.user_message.substring(0, 30)}...</div>
+                        <div class="response-preview">${res.ai_response}</div>
+                    </div>
+                `).join('');
+
+                // Add click listeners to show full response
+                document.querySelectorAll('.response-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const responseId = item.dataset.responseId;
+                        window.open(`view_response.html?id=${responseId}`, '_blank');
+                    });
+                });
+
+            } catch (error) {
+                console.error('Error loading saved responses:', error);
+                container.innerHTML = '<div class="empty-state">Error loading responses.</div>';
+            }
         }
     </script>
 </body>

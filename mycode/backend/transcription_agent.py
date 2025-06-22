@@ -6,17 +6,6 @@ from pathlib import Path
 import tempfile
 import shutil
 
-# Load environment variables from .env file
-from dotenv import load_dotenv
-from pathlib import Path
-
-# Look for .env in parent directory (root) first, then current directory
-parent_env = Path(__file__).parent.parent / ".env"
-if parent_env.exists():
-    load_dotenv(parent_env)
-else:
-    load_dotenv()
-
 import google.generativeai as genai
 from groq import Groq
 from pydantic import BaseModel, Field

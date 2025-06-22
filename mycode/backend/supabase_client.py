@@ -30,10 +30,10 @@ class SupabaseManager:
     
     def __init__(self):
         self.supabase_url = os.getenv("SUPABASE_URL")
-        self.supabase_key = os.getenv("SUPABASE_ANON_KEY")
+        self.supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
         
         if not self.supabase_url or not self.supabase_key:
-            raise ValueError("SUPABASE_URL and SUPABASE_ANON_KEY must be set in environment variables")
+            raise ValueError("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set in environment variables")
         
         self.client: Client = create_client(self.supabase_url, self.supabase_key)
     
@@ -43,7 +43,7 @@ class SupabaseManager:
         # For now, we'll assume the table exists with the correct schema
         pass
     
-    async def store_transcription(self, transcription_data: Dict[str, Any], user_id: str = None) -> str:
+    async def store_transcription(self, transcription_data: Dict[str, Any], user_id: str = None) -> Dict[str, Any]:
         """Store a transcription record in Supabase"""
         try:
             print(f"🔍 Debug: Processing transcription data with keys: {list(transcription_data.keys())}")
@@ -82,7 +82,7 @@ class SupabaseManager:
             print(f"🔍 Debug: Supabase insert result: {result}")
             
             if result.data:
-                return result.data[0]['id']
+                return result
             else:
                 raise Exception("Failed to insert transcription record")
                 
